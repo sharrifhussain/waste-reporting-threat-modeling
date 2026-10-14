@@ -1,214 +1,98 @@
-# Waste Reporting App - ELK Stack Lab
+# Waste Reporting Tool – Threat Modeling & Security Monitoring
 
-## Overview
+## 1. Project Overview
 
-This project demonstrates a local ELK Stack implementation for a simulated Waste Reporting Application.
+This project focuses on threat modeling and security monitoring for a simulated Waste Reporting Tool.
 
-The stack consists of:
+The objective is to identify potential security threats, analyze them using the STRIDE framework, map relevant threats to MITRE ATT&CK techniques, and assess their risk levels.
 
-* Elasticsearch - log storage and search
-* Logstash - log collection and parsing
-* Kibana - log visualization and analysis
-* Python - fake HTTP log generation
-* Docker - containerized deployment
+The project also uses the ELK Stack (Elasticsearch, Logstash, and Kibana) to collect, process, search, and visualize simulated application logs.
 
-The application generates simulated HTTP access logs such as GET and POST requests. Logstash parses the logs and sends the structured events to Elasticsearch, where they can be searched and analyzed in Kibana.
+**Note:** The application architecture represents an assumed logical design for threat modeling. The application itself is simulated through generated HTTP logs.
 
-## Architecture
+## 2. Project Objectives
 
-```text
-Python Log Generator
-        |
-        v
-logs/waste-app.log
-        |
-        v
-    Logstash
-        |
-        v
-   Elasticsearch
-        |
-        v
-      Kibana
-```
+* Understand the system architecture.
+* Identify potential security threats using STRIDE.
+* Map threats to relevant MITRE ATT&CK techniques.
+* Evaluate risks based on likelihood and impact.
+* Process simulated application logs using Logstash.
+* Store and search logs using Elasticsearch.
+* Visualize security events using Kibana.
+* Identify opportunities for security monitoring and detection.
 
-## Project Structure
+## 3. System Architecture
 
-```text
-waste-reporting-elk/
-├── docker-compose.yml
-├── README.md
-├── .gitignore
-├── logstash/
-│   └── pipeline/
-│       └── logstash.conf
-├── scripts/
-│   └── generate_logs.py
-├── screenshots/
-└── logs/
-```
+The assumed application architecture includes:
 
-## Technologies Used
+* Frontend: User interface for submitting waste reports.
+* Backend: Handles authentication, report submission, and application logic.
+* Database: Stores user information and waste reports.
+* ELK Stack: Monitors simulated application logs.
 
-* Docker
-* Docker Compose
-* Elasticsearch 8.15.3
-* Logstash 8.15.3
-* Kibana 8.15.3
-* Python 3
-* Grok
-* REST API
+See `threat-model/system-diagram.png` for the architecture diagram.
 
-## Setup
+## 4. STRIDE Threat Modeling
 
-### 1. Start the ELK Stack
+The STRIDE framework was used to identify six categories of potential threats:
 
-From the project directory:
+* Spoofing
+* Tampering
+* Repudiation
+* Information Disclosure
+* Denial of Service
+* Elevation of Privilege
 
-```bash
-sudo docker compose up -d
-```
+Detailed analysis is available in `threat-model/stride-threats.md`.
 
-Check the containers:
+## 5. MITRE ATT&CK Mapping
 
-```bash
-sudo docker compose ps
-```
+Potential threats were mapped to relevant MITRE ATT&CK techniques to support threat understanding and detection planning.
 
-The Elasticsearch, Logstash, and Kibana containers should be running.
+See `threat-model/mitre-mapping.md`.
 
-### 2. Verify Elasticsearch
+## 6. Risk Assessment
 
-```bash
-curl http://localhost:9200
-```
+Each identified threat was assessed using:
 
-### 3. Generate Fake HTTP Logs
+* Likelihood: 1–5
+* Impact: 1–5
+* Risk Score: Likelihood × Impact
 
-Run:
+See `threat-model/risk-assessment.md`.
 
-```bash
-python3 scripts/generate_logs.py
-```
+## 7. ELK Stack Integration
 
-The script continuously generates simulated HTTP requests and writes them to:
+The ELK Stack was configured using Docker Compose.
 
-```text
-logs/waste-app.log
-```
+* Elasticsearch: Stores and indexes application logs.
+* Logstash: Reads and parses simulated HTTP logs.
+* Kibana: Provides log searching and visualization.
 
-### 4. View Logs in Kibana
+The simulated logs include client IP, HTTP method, endpoint, status code, and response time.
 
-Open:
+## 8. Detection and Monitoring
 
-```text
-http://localhost:5601
-```
+Example monitoring query for failed login attempts:
 
-Go to:
+`endpoint: "/api/login" AND status_code: 401`
 
-**Analytics → Discover**
+This query can help identify repeated failed login events in the simulated dataset.
 
-Create/select the following data view:
+See `detection/detection-rules.md` for detection documentation.
 
-```text
-waste-logs-*
-```
+## 9. Screenshots
 
-Use:
+Project screenshots will demonstrate:
 
-```text
-@timestamp
-```
+* System architecture diagram.
+* STRIDE threat analysis.
+* Kibana Discover log events.
+* Kibana security monitoring dashboard.
 
-as the timestamp field.
+## 10. Conclusion
 
-The logs can then be searched and analyzed in Discover.
+This project demonstrates a basic threat modeling and security monitoring workflow for a simulated web application.
 
-## Log Format
+It combines STRIDE analysis, MITRE ATT&CK mapping, risk assessment, and ELK-based log monitoring to develop a foundational understanding of application security and SOC monitoring.
 
-The generated logs follow this format:
-
-```text
-timestamp client_ip http_method endpoint status_code response_time
-```
-
-Example:
-
-```text
-2026-10-07T20:21:10 192.168.1.24 POST /api/report 201 145
-```
-
-## Parsed Fields
-
-Logstash extracts the following fields:
-
-| Field           | Description                   |
-| --------------- | ----------------------------- |
-| `timestamp`     | Original event timestamp      |
-| `client_ip`     | Simulated client IP address   |
-| `http_method`   | HTTP request method           |
-| `endpoint`      | Requested API endpoint        |
-| `status_code`   | HTTP response status          |
-| `response_time` | Response time in milliseconds |
-| `@timestamp`    | Elasticsearch event timestamp |
-
-## Example Use Cases
-
-The logs can be used to investigate:
-
-* Successful API requests
-* Failed authentication attempts
-* HTTP 4xx errors
-* HTTP 5xx errors
-* Slow responses
-* Frequently accessed endpoints
-* Suspicious request patterns
-
-For example, in Kibana Discover:
-
-```text
-status_code: 401
-```
-
-can be used to find unauthorized requests.
-
-## Screenshots
-
-### Docker Containers
-
-![Docker Containers](screenshots/docker-compose-ps.png)
-
-### Elasticsearch
-
-![Elasticsearch](screenshots/elasticsearch.png)
-
-### Logstash Processing
-
-![Logstash Processing](screenshots/logstash.png)
-
-### Kibana Discover
-
-![Kibana Discover](screenshots/kibana-discover.png)
-
-### Log Generator
-
-![Log Generator](screenshots/log-generator.png)
-
-## Stopping the Environment
-
-To stop the containers:
-
-```bash
-sudo docker compose down
-```
-
-To start them again:
-
-```bash
-sudo docker compose up -d
-```
-
-## Conclusion
-
-This project demonstrates a complete local log ingestion pipeline using Docker, Logstash, Elasticsearch, and Kibana. Simulated waste reporting application logs are generated, parsed, stored, and visualized for basic monitoring and analysis.
