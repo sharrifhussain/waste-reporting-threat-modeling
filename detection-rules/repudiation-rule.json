@@ -1,0 +1,19 @@
+{
+  "rule_id": "DET-003",
+  "rule_name": "Audit Event Missing Actor Identity",
+  "threat_category": "Repudiation",
+  "description": "Identifies audit events that do not contain an associated user or actor identity.",
+  "detection": {
+    "index": "waste-logs-*",
+    "conditions": {
+      "event_type": "audit",
+      "missing_fields": [
+        "user_id",
+        "actor",
+        "actor_id"
+      ]
+    }
+  },
+  "severity": "Medium",
+  "note": "Missing actor identity is an audit accountability gap and requires investigation."
+}

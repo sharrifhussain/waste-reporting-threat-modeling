@@ -1,0 +1,14 @@
+{
+  "rule_id": "DET-002",
+  "rule_name": "Sensitive Data Modification Request",
+  "threat_category": "Tampering",
+  "description": "Identifies HTTP methods commonly used to modify or delete application resources.",
+  "detection": {
+    "index": "waste-logs-*",
+    "conditions": {
+      "http_method": ["PUT", "PATCH", "DELETE"]
+    }
+  },
+  "severity": "Medium",
+  "note": "A matching request is an indicator for investigation, not proof of unauthorized modification."
+}

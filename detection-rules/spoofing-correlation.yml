@@ -1,0 +1,25 @@
+title: Repeated Failed Login Attempts From Same IP
+id: 9a4e2c71-6b83-4d15-a720-3f8c5e123456
+status: test
+description: Detects five or more failed login attempts from the same source IP within five minutes.
+author: Sharrif Hussain
+date: 2026-10-24
+
+correlation:
+    type: event_count
+    rules:
+        - 5d7c2a91-8f34-4b61-a205-9c6e7f123456
+    group-by:
+        - client_ip
+    timespan: 5m
+    condition:
+        gte: 5
+
+falsepositives:
+    - Multiple incorrect passwords entered by a legitimate user.
+    - Automated login testing from a single IP address.
+
+level: high
+
+tags:
+    - attack.t1110

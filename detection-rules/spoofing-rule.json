@@ -1,0 +1,20 @@
+{
+  "rule_id": "DET-001",
+  "rule_name": "Repeated Failed Login Attempts",
+  "threat_category": "Spoofing",
+  "description": "Detects repeated failed login attempts from the same source IP.",
+  "detection": {
+    "index": "waste-logs-*",
+    "conditions": {
+      "endpoint": "/api/login",
+      "status_code": 401
+    },
+    "group_by": "client_ip",
+    "threshold": 5
+  },
+  "severity": "High",
+  "mitre_attack": {
+    "technique": "T1110",
+    "name": "Brute Force"
+  }
+}

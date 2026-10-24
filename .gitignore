@@ -1,2 +1,13 @@
 logs/*.log
 logstash.conf.backup
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Python virtual environment
+.venv/
+.venv-sigma/
+
+# Backup files
+*.bak
