@@ -1,3 +1,4 @@
+
 {
   "rule_id": "DET-002",
   "rule_name": "Sensitive Data Modification Request",
@@ -10,5 +11,26 @@
     }
   },
   "severity": "Medium",
+  "false_positives": [
+    "Authorized administrators updating application records.",
+    "Legitimate users modifying their own information.",
+    "Normal application workflows using PUT or PATCH requests.",
+    "Automated application testing and QA activities.",
+    "Authorized DELETE requests performed during routine maintenance."
+  ],
+  "tuning_adjustments": [
+    "Review the source IP and user identity before escalating an alert.",
+    "Check whether the HTTP request was made by an authorized user.",
+    "Review the endpoint and timestamp to identify unusual modification activity.",
+    "Correlate modification requests with application audit logs.",
+    "Investigate repeated DELETE requests and unexpected modification activity."
+  ],
+  "investigation_guidance": [
+    "Identify the user and source IP associated with the request.",
+    "Review the affected endpoint and HTTP method.",
+    "Check application audit logs for evidence of unauthorized changes.",
+    "Confirm whether the modification was authorized."
+  ],
   "note": "A matching request is an indicator for investigation, not proof of unauthorized modification."
 }
+
