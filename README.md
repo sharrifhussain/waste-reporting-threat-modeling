@@ -1,98 +1,56 @@
-# Waste Reporting Tool – Threat Modeling & Security Monitoring
+## 11. Sigma Detection Rules
 
-## 1. Project Overview
+Sigma was used to define standardized detection logic for security monitoring.
 
-This project focuses on threat modeling and security monitoring for a simulated Waste Reporting Tool.
+### 11.1 Spoofing Detection
 
-The objective is to identify potential security threats, analyze them using the STRIDE framework, map relevant threats to MITRE ATT&CK techniques, and assess their risk levels.
+The failed login detection identifies unsuccessful login attempts against the application.
 
-The project also uses the ELK Stack (Elasticsearch, Logstash, and Kibana) to collect, process, search, and visualize simulated application logs.
+Detection criteria:
+- Endpoint: `/api/login`
+- Status code: `401`
+- Correlation field: `client_ip`
+- Threshold: 5 or more events within 5 minutes
+- Severity: High
+- MITRE ATT&CK: T1110 – Brute Force
 
-**Note:** The application architecture represents an assumed logical design for threat modeling. The application itself is simulated through generated HTTP logs.
+Sigma files:
+- `detection-rules/spoofing-base.yml`
+- `detection-rules/spoofing-correlation.yml`
 
-## 2. Project Objectives
+### 11.2 Tampering Detection
 
-* Understand the system architecture.
-* Identify potential security threats using STRIDE.
-* Map threats to relevant MITRE ATT&CK techniques.
-* Evaluate risks based on likelihood and impact.
-* Process simulated application logs using Logstash.
-* Store and search logs using Elasticsearch.
-* Visualize security events using Kibana.
-* Identify opportunities for security monitoring and detection.
+The tampering detection rule identifies HTTP methods commonly associated with resource modification or deletion.
 
-## 3. System Architecture
+Detection criteria:
+- HTTP methods: PUT, PATCH, DELETE
+- Severity: Medium
 
-The assumed application architecture includes:
+False positives may include authorized administrative changes, normal application workflows, and QA testing activities.
 
-* Frontend: User interface for submitting waste reports.
-* Backend: Handles authentication, report submission, and application logic.
-* Database: Stores user information and waste reports.
-* ELK Stack: Monitors simulated application logs.
+Investigation includes reviewing the source IP, user identity, endpoint, and application audit logs. A matching request is an indicator for investigation and does not automatically prove unauthorized activity.
 
-See `threat-model/system-diagram.png` for the architecture diagram.
+Rule file: `detection-rules/tampering-rule.json`
 
-## 4. STRIDE Threat Modeling
+## 12. Sigma Validation and Testing
 
-The STRIDE framework was used to identify six categories of potential threats:
+Sigma rules were validated using the Sigma CLI.
 
-* Spoofing
-* Tampering
-* Repudiation
-* Information Disclosure
-* Denial of Service
-* Elevation of Privilege
+Validation command:
 
-Detailed analysis is available in `threat-model/stride-threats.md`.
+` sigma check detection-rules/ `
 
-## 5. MITRE ATT&CK Mapping
+The validation completed with zero rule errors, condition errors, and validation issues.
 
-Potential threats were mapped to relevant MITRE ATT&CK techniques to support threat understanding and detection planning.
+The failed login correlation logic was converted into Elasticsearch ES|QL and tested in Kibana Dev Tools.
 
-See `threat-model/mitre-mapping.md`.
+The test identified 10 failed login events from source IP `192.168.1.25`, meeting the configured threshold of five events within five minutes.
 
-## 6. Risk Assessment
+Note: This confirms the query logic against the available sample logs. It does not represent an automatically configured Kibana alert.
 
-Each identified threat was assessed using:
+## 13. Testing Evidence
 
-* Likelihood: 1–5
-* Impact: 1–5
-* Risk Score: Likelihood × Impact
+The following screenshots provide evidence of the detection testing:
 
-See `threat-model/risk-assessment.md`.
-
-## 7. ELK Stack Integration
-
-The ELK Stack was configured using Docker Compose.
-
-* Elasticsearch: Stores and indexes application logs.
-* Logstash: Reads and parses simulated HTTP logs.
-* Kibana: Provides log searching and visualization.
-
-The simulated logs include client IP, HTTP method, endpoint, status code, and response time.
-
-## 8. Detection and Monitoring
-
-Example monitoring query for failed login attempts:
-
-`endpoint: "/api/login" AND status_code: 401`
-
-This query can help identify repeated failed login events in the simulated dataset.
-
-See `detection/detection-rules.md` for detection documentation.
-
-## 9. Screenshots
-
-Project screenshots will demonstrate:
-
-* System architecture diagram.
-* STRIDE threat analysis.
-* Kibana Discover log events.
-* Kibana security monitoring dashboard.
-
-## 10. Conclusion
-
-This project demonstrates a basic threat modeling and security monitoring workflow for a simulated web application.
-
-It combines STRIDE analysis, MITRE ATT&CK mapping, risk assessment, and ELK-based log monitoring to develop a foundational understanding of application security and SOC monitoring.
-
+- `evidence/spoofing-sigma-kibana-test.png` – Failed login detection testing.
+- `evidence/spoofing-correlation-esql-test.png` – Correlation query testing in Kibana.
